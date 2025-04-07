@@ -1,0 +1,177 @@
+✅ Resumo do que você tem
+Classes e Interfaces
+IOrdenator<T>: interface de ordenação genérica.
+
+Bubblesort<T> e InsertionSort<T>: implementações de ordenação, usam polimorfismo com IOrdenator.
+
+Produto: classe abstrata com atributos e métodos comuns.
+
+ProdutoNaoPerecivel e ProdutoPerecivel: subclasses concretas de Produto.
+
+Método Produto.criarDoTexto(...) lê produtos do tipo 1 (não perecível) e 2 (perecível) a partir de um .txt.
+
+💡 O que pode cair (com foco em polimorfismo)
+1. Leitura de produtos de um arquivo
+Você já tem isso quase pronto. Exemplo de código:
+
+java
+Copiar
+Editar
+List<Produto> produtos = new ArrayList<>();
+
+try (BufferedReader br = new BufferedReader(new FileReader("produtos.txt"))) {
+    String linha;
+    while ((linha = br.readLine()) != null) {
+        Produto produto = Produto.criarDoTexto(linha);
+        produtos.add(produto); // POLIMORFISMO: uma lista de Produto armazena diferentes tipos de Produto
+    }
+} catch (IOException e) {
+    e.printStackTrace();
+}
+🔁 A lista List<Produto> armazena ProdutoPerecivel e ProdutoNaoPerecivel, mas você trata tudo como Produto.
+
+2. Ordenação com polimorfismo
+Você pode usar qualquer ordenador com qualquer tipo de produto:
+
+java
+Copiar
+Editar
+IOrdenator<Produto> ordenator = new Bubblesort<>(); // ou new InsertionSort<>();
+Produto[] arrayProdutos = produtos.toArray(new Produto[0]);
+
+ordenator.ordenar(arrayProdutos);
+
+System.out.println("Comparações: " + ordenator.getComparacoes());
+System.out.println("Movimentações: " + ordenator.getMovimentacoes());
+System.out.println("Tempo: " + ordenator.getTempoOrdenacao() + " ms");
+Aqui também rola polimorfismo duplo:
+
+Interface IOrdenator com implementações diferentes.
+
+Array de Produto contendo objetos de subclasses.
+
+3. Uso de métodos polimórficos
+Você pode chamar métodos como valorDeVenda() sem saber o tipo concreto:
+
+java
+Copiar
+Editar
+for (Produto p : arrayProdutos) {
+    System.out.println(p); // toString chama valorDeVenda(), que é implementado de forma diferente em cada subclasse
+}
+Ou seja: mesmo que p seja do tipo Produto, o método correto da subclasse vai ser chamado.
+
+📁 Exemplo de produtos.txt
+swift
+Copiar
+Editar
+1;Sabonete;2.50;0.30
+2;Leite;3.90;0.25;15/05/2025
+1;Shampoo;7.00;0.50
+2;Iogurte;4.00;0.20;10/04/2025
+💥 Dicas para a prova/atividade
+⚠️ Não use instanceof à toa, o código já usa polimorfismo corretamente.
+
+✨ Valorize o uso de abstrações: Produto como superclasse e IOrdenator como interface.
+
+🧪 Testa seu código antes com diferentes entradas no produtos.txt.
+
+🎯 Se pedirem para ordenar por valor de venda, mude o compareTo para usar valorDeVenda():
+
+java
+Copiar
+Editar
+public int compareTo(Produto outro) {
+    return Double.compare(this.valorDeVenda(), outro.valorDeVenda());
+}
+Quer que eu monte um exemplo completo de programa principal (main) com leitura do .txt, ordenação e exibição?
+
+
+
+
+
+
+
+Você disse:
+eu quero um exemplo completo de programa principal (main) com leitura do .txt, ordenação e exibição
+
+
+O ChatGPT disse:
+Perfeito! Aqui vai um exemplo completo de programa principal (Main.java), que:
+
+Lê os produtos do arquivo produtos.txt
+
+Usa Produto.criarDoTexto(...) para instanciar as subclasses
+
+Armazena tudo em uma lista de Produto
+
+Converte pra array
+
+Ordena com IOrdenator<Produto> (usando Bubblesort)
+
+Exibe todos os produtos ordenados + estatísticas da ordenação
+
+🧠 Pré-requisitos (certifique-se que você tenha):
+Produto.java (classe abstrata)
+
+ProdutoPerecivel.java
+
+ProdutoNaoPerecivel.java
+
+IOrdenator<T>.java
+
+Bubblesort<T>.java (ou InsertionSort<T>.java)
+
+O método Produto.criarDoTexto(String linha) devidamente implementado
+
+✅ Arquivo Main.java
+java
+Copiar
+Editar
+import java.io.*;
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        List<Produto> produtos = new ArrayList<>();
+
+        // Leitura do arquivo
+        try (BufferedReader br = new BufferedReader(new FileReader("produtos.txt"))) {
+            String linha;
+            while ((linha = br.readLine()) != null) {
+                Produto produto = Produto.criarDoTexto(linha);
+                produtos.add(produto);
+            }
+        } catch (IOException e) {
+            System.err.println("Erro ao ler o arquivo: " + e.getMessage());
+            return;
+        }
+
+        // Convertendo lista para array
+        Produto[] arrayProdutos = produtos.toArray(new Produto[0]);
+
+        // Ordenação usando polimorfismo
+        IOrdenator<Produto> ordenator = new Bubblesort<>(); // ou InsertionSort<>
+        ordenator.ordenar(arrayProdutos);
+
+        // Exibição dos produtos ordenados
+        System.out.println("=== Produtos Ordenados (por valor de venda) ===");
+        for (Produto p : arrayProdutos) {
+            System.out.println(p); // toString polimórfico
+        }
+
+        // Estatísticas
+        System.out.println("\n=== Estatísticas de Ordenação ===");
+        System.out.println("Comparações: " + ordenator.getComparacoes());
+        System.out.println("Movimentações: " + ordenator.getMovimentacoes());
+        System.out.println("Tempo de execução: " + ordenator.getTempoOrdenacao() + " ms");
+    }
+}
+📝 Exemplo de Produto.compareTo() (se for por valorDeVenda()):
+java
+Copiar
+Editar
+@Override
+public int compareTo(Produto outro) {
+    return Double.compare(this.valorDeVenda(), outro.valorDeVenda());
+}
